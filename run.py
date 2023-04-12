@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return render_template("nidIN.html")
+    return render_template("home.html")
 
 
 @app.route('/results', methods=["POST"])
