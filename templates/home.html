@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Bootstrap Example</title>
+  <title>NID MAKER</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -10,20 +10,16 @@
 <body>
 
 <div class="container mt-3">
-  <h2>Details About Nid</h2>
+  <h2>Simple NID Maker Tools</h2>
+  <h6>Create By: Faysal</h6>
   <form action="/results" method="post">
     <div class="mb-3 mt-3">
       <label for="email">NID:</label>
-      <input type="text" class="form-control" name="nid" placeholder="Enter NID NO" name="email">
+      <input type="text" class="form-control" id="email" name="nid" placeholder="Enter NID NO" name="email">
     </div>
     <div class="mb-3">
       <label for="pwd">BIRTH:</label>
-      <input type="text" class="form-control" name="birth" placeholder="YYYY-MM-DD" name="pswd">
-    </div>
-    <div class="form-check mb-3">
-      <label class="form-check-label">
-        <input class="form-check-input" type="checkbox" name="remember"> Remember me
-      </label>
+      <input type="text" class="form-control" id="pwd" name="birth" placeholder="YYYY-MM-DD" name="pswd">
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
