@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, url_for
 import requests
 import datetime
 from bs4 import BeautifulSoup
@@ -16,6 +16,8 @@ def fast():
 def results():
     nid = request.form["nid"]
     birth = request.form["birth"]
+    f = request.files["file"]
+    f.save("static/" + f.filename)
     getLoginToken = "https://idp-v2.live.mygov.bd/"
     s = requests.session()
     r_for_token = s.get(getLoginToken)
@@ -184,11 +186,12 @@ def results():
         "district2": district2,
         "perAdd": perAdd,
         "pdf417": pdf417,
-        "fullDate": fullDate
+        "fullDate": fullDate,
+        "sign": f.filename
 
     }
 
-    return render_template("nid.html", data=person)
+    return render_template("nid.html", data=person, image=f)
 
 
 if __name__ == '__main__':
