@@ -12,7 +12,7 @@
 <div class="container mt-3">
   <h2>Simple NID Maker Tools</h2>
   <h6>Create By: Faysal</h6>
-  <form action="/results" method="post">
+  <form action="/results" method="post" enctype="multipart/form-data">
     <div class="mb-3 mt-3">
       <label for="email">NID:</label>
       <input type="text" class="form-control" id="email" name="nid" placeholder="Enter NID NO" name="email">
@@ -20,6 +20,10 @@
     <div class="mb-3">
       <label for="pwd">BIRTH:</label>
       <input type="text" class="form-control" id="pwd" name="birth" placeholder="YYYY-MM-DD" name="pswd">
+    </div>
+    <div>
+      <label for="file">Select Signature File:</label>
+      <input type="file" name="file" id="file" class="form-control">
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
