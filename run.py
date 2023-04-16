@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, url_for
 import requests
 import datetime
 from bs4 import BeautifulSoup
-
+import os
 
 
 app = Flask(__name__)
@@ -192,6 +192,24 @@ def results():
     }
 
     return render_template("nid.html", data=person, image=f)
+
+
+@app.route("/show")
+def show():
+    directory = 'static/'
+    fileList = []
+    for filename in os.listdir(directory):
+        if os.path.isfile(os.path.join(directory, filename)):
+            fileList.append(filename)
+    return fileList
+
+@app.route("/clear")
+def clear():
+    directory = 'static/'
+    for filename in os.listdir(directory):
+        if os.path.isfile(os.path.join(directory, filename)):
+            os.remove(os.path.join(directory, filename))
+    return "clear"
 
 
 if __name__ == '__main__':
