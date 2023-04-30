@@ -7,7 +7,7 @@ import os
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/home')
 def fast():
     return render_template("home.html")
 
