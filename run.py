@@ -18,10 +18,11 @@ class User(db.Model):
     email = db.Column(db.String(50), unique=True)
     phone = db.Column(db.String(20), nullable=True)
     password = db.Column(db.String(50), nullable=False)
+    balance = db.Column(db.Integer, default=0)
     rate = db.Column(db.Integer, default=10)
     apikey = db.Column(db.String(1000), nullable=True)
     count = db.Column(db.Integer, nullable=True)
-    active = db.Column(db.Integer, nullable=False, default=0)
+    active = db.Column(db.Integer, nullable=False, default=1)
 
 
 with app.app_context():
@@ -78,7 +79,7 @@ def login():
 @app.route("/")
 def home():
     if "user" in session:
-        return render_template("home.html")
+        return render_template("home.html", email=session['user'])
     else:
         return redirect(url_for("login"))
 
@@ -93,6 +94,9 @@ def home():
 
 @app.route('/results', methods=["POST", "GET"])
 def results():
+    email = session['user']
+    user = User.query.filter_by(email=email).first()
+
     if request.method == 'POST':
         nid = request.form["nid"]
         birth = request.form["birth"]
