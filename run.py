@@ -21,7 +21,7 @@ class User(db.Model):
     balance = db.Column(db.Integer, default=0)
     rate = db.Column(db.Integer, default=10)
     apikey = db.Column(db.String(1000), nullable=True)
-    count = db.Column(db.Integer, nullable=True)
+    count = db.Column(db.Integer, default=0)
     active = db.Column(db.Integer, nullable=False, default=1)
 
 
@@ -105,6 +105,14 @@ def results():
             f.save("static/" + f.filename)
         else:
             f.filename = "blank.png"
+
+
+        email = session["user"]
+        admin = User.query.filter_by(email=email).first()
+        admin.count += 1
+        db.session.commit()
+
+
         getLoginToken = "https://idp-v2.live.mygov.bd/"
         s = requests.session()
         r_for_token = s.get(getLoginToken)
@@ -277,6 +285,8 @@ def results():
             "sign": f.filename
 
         }
+
+
 
         return render_template("nid.html", data=person, image=f)
 
