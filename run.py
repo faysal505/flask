@@ -22,7 +22,7 @@ class User(db.Model):
     rate = db.Column(db.Integer, default=10)
     apikey = db.Column(db.String(1000), nullable=True)
     count = db.Column(db.Integer, default=0)
-    active = db.Column(db.Integer, nullable=False, default=1)
+    active = db.Column(db.Integer, nullable=False, default=0)
 
 
 with app.app_context():
@@ -68,7 +68,7 @@ def login():
                     session['user'] = email
                     return redirect(url_for("home"))
                 else:
-                    return render_template("login.html", message='<p class="text-center text-success">Account Not Active</p>')
+                    return render_template("login.html", message='<p class="text-center text-success">Admin Not Active Your Account</p>')
             else:
                 return render_template("login.html", message='<p class="text-center text-success">Password Not Match</p>')
 
@@ -79,7 +79,9 @@ def login():
 @app.route("/")
 def home():
     if "user" in session:
-        return render_template("home.html", email=session['user'])
+        email = session['user']
+        user = User.query.filter_by(email=email).first()
+        return render_template("home.html", email=session['user'], balance=user.balance, rate=user.rate)
     else:
         return redirect(url_for("login"))
 
@@ -174,6 +176,7 @@ def results():
             cityCorporationOrMunicipality2 = ''
         upozila2 = diccct['data']['presentAddress']['upozila']
         district2 = diccct['data']['presentAddress']['district']
+        birthOfPlace = diccct['data']['permanentAddress']['district']
 
         def nidBirth(v):
             nidBirth = ""
@@ -280,6 +283,7 @@ def results():
             "cityCorporationOrMunicipality2": cityCorporationOrMunicipality2,
             "district2": district2,
             "perAdd": perAdd,
+            "birthOfPlace": birthOfPlace,
             "pdf417": pdf417,
             "fullDate": fullDate,
             "sign": f.filename
@@ -287,11 +291,15 @@ def results():
         }
 
 
-
-        return render_template("nid.html", data=person, image=f)
+        if admin.rate <= admin.balance:
+            admin.balance = admin.balance - admin.rate
+            db.session.commit()
+            return render_template("nid.html", data=person, image=f)
+        else:
+            return render_template("home.html", balance=admin.balance, rate=admin.rate, alert='<script>alert("Not Enough Balance")</script>')
 
     if request.method == "GET":
-        return redirect(url_for("home"))
+        return redirect(url_for("home", balance=user.balance))
 
 
 
