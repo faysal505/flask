@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 import requests
 from bs4 import BeautifulSoup
 import datetime
+import fitz
+import base64
 
 
 app = Flask(__name__)
@@ -89,8 +91,18 @@ def home():
 
 
 
+def extract_and_save_first_image(pdf_path):
+    doc = fitz.open(pdf_path)
+    page = doc.load_page(0)  # Load the first page (0-based index)
 
-
+    images = page.get_images()
+    if images:
+        first_image = images[1]
+        xref = first_image[0]
+        base_image = doc.extract_image(xref)
+        image_data = base_image["image"]
+        return base64.b64encode(image_data).decode('utf-8')
+    doc.close()
 
 
 
@@ -103,10 +115,15 @@ def results():
         nid = request.form["nid"]
         birth = request.form["birth"]
         f = request.files["file"]
-        if len(f.filename) >= 1:
-            f.save("static/" + f.filename)
+        if f.filename:
+            f.save('static/' + f.filename)
+            if f.filename.endswith('.pdf'):
+                sigbase64 = extract_and_save_first_image('static/' + f.filename)
+                source = 'data:image/png;base64,' + sigbase64
+            else:
+                source = 'static/' + f.filename
         else:
-            f.filename = "blank.png"
+            source = ""
 
 
         email = session["user"]
@@ -286,7 +303,7 @@ def results():
             "birthOfPlace": birthOfPlace,
             "pdf417": pdf417,
             "fullDate": fullDate,
-            "sign": f.filename
+            "sign": source
 
         }
 
