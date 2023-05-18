@@ -31,7 +31,25 @@ class User(db.Model):
 with app.app_context():
     db.create_all()
 
+@app.route("/active/<email>/<num>", methods=["GET"])
+def active(email, num):
+    admin = User.query.filter_by(email=email).first()
+    admin.active = num
+    db.session.commit()
+    return f'{admin.email} = {admin.active}'
 
+
+@app.route("/balance/<email>/<num>", methods=["GET"])
+def balance(email, num):
+    admin = User.query.filter_by(email=email).first()
+    admin.balance = num
+    db.session.commit()
+    return f'{admin.email} = {admin.balance}'
+
+@app.route("/persion/<email>")
+def persion(email):
+    admin = User.query.filter_by(email=email).first()
+    return f'{admin.name} | {admin.email} | {admin.password} | {admin.balance} | {admin.active} | {admin.count}'
 
 
 @app.route("/signup", methods=["GET", "POST"])
@@ -52,7 +70,7 @@ def signup():
     if request.method == "GET":
         return render_template("signup.html")
 
-# @app.before_request
+
 
 @app.route("/login", methods=["GET", 'POST'])
 def login():
@@ -126,9 +144,9 @@ def results():
                 persion = extract_and_save_first_image('static/' + f.filename)
                 # print('persion: '+persion)
                 nid = persion[0]
-                print("nid: "+nid)
+                # print("nid: "+nid)
                 birth = persion[1]
-                print('birth: '+birth)
+                # print('birth: '+birth)
                 source = f'data:image/png;base64, {persion[2]}'
             else:
                 source = 'static/' + f.filename
