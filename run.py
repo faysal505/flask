@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import datetime
 import fitz
 import base64
+import re
 
 
 app = Flask(__name__)
@@ -91,17 +92,22 @@ def home():
 
 
 
+
 def extract_and_save_first_image(pdf_path):
     doc = fitz.open(pdf_path)
-    page = doc.load_page(0)  # Load the first page (0-based index)
-
+    page = doc.load_page(0)
+    text = page.get_text()
+    pattern = r"\d{10}|\d{4}-\d{2}-\d{2}"
+    matches = re.findall(pattern, text)
     images = page.get_images()
     if images:
         first_image = images[1]
         xref = first_image[0]
         base_image = doc.extract_image(xref)
         image_data = base_image["image"]
-        return base64.b64encode(image_data).decode('utf-8')
+        imageBase64 = base64.b64encode(image_data).decode('utf-8')
+        matches.append(imageBase64)
+        return matches
     doc.close()
 
 
@@ -118,14 +124,18 @@ def results():
         if f.filename:
             f.save('static/' + f.filename)
             if f.filename.endswith('.pdf'):
-                sigbase64 = extract_and_save_first_image('static/' + f.filename)
-                source = 'data:image/png;base64,' + sigbase64
+                persion = extract_and_save_first_image('static/' + f.filename)
+                print(persion)
+                nid = persion[0]
+                birth = persion[3]
+                source = f'data:image/png;base64, {persion[4]}'
+                print(source)
             else:
                 source = 'static/' + f.filename
         else:
             source = ""
 
-
+        print('show ' + nid)
         email = session["user"]
         admin = User.query.filter_by(email=email).first()
         admin.count += 1
