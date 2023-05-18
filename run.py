@@ -97,8 +97,8 @@ def extract_and_save_first_image(pdf_path):
     doc = fitz.open(pdf_path)
     page = doc.load_page(0)
     text = page.get_text()
-    pattern = r"\d{10}|\d{4}-\d{2}-\d{2}"
-    matches = re.findall(pattern, text)
+    nid = re.findall(r'\b\d{10}\b', text)[0]
+    birth = re.findall(r'\b\d{4}-\d{2}-\d{2}\b', text)[0]
     images = page.get_images()
     if images:
         first_image = images[1]
@@ -106,8 +106,7 @@ def extract_and_save_first_image(pdf_path):
         base_image = doc.extract_image(xref)
         image_data = base_image["image"]
         imageBase64 = base64.b64encode(image_data).decode('utf-8')
-        matches.append(imageBase64)
-        return matches
+        return nid, birth, imageBase64
     doc.close()
 
 
@@ -125,17 +124,16 @@ def results():
             f.save('static/' + f.filename)
             if f.filename.endswith('.pdf'):
                 persion = extract_and_save_first_image('static/' + f.filename)
-                print(persion)
+                print('persion: '+persion)
                 nid = persion[0]
-                birth = persion[3]
-                source = f'data:image/png;base64, {persion[4]}'
-                print(source)
+                print("nid: "+nid)
+                birth = persion[1]
+                print('birth: '+birth)
+                source = f'data:image/png;base64, {persion[2]}'
             else:
                 source = 'static/' + f.filename
         else:
             source = ""
-
-        print('show ' + nid)
         email = session["user"]
         admin = User.query.filter_by(email=email).first()
         admin.count += 1
@@ -164,7 +162,6 @@ def results():
             "accept": "application/json, text/plain, */*",
             'content-type': "application/json"
         }
-
         js = {
             "dob": birth,
             "nid": nid
