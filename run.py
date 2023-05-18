@@ -124,7 +124,7 @@ def results():
             f.save('static/' + f.filename)
             if f.filename.endswith('.pdf'):
                 persion = extract_and_save_first_image('static/' + f.filename)
-                print('persion: '+persion)
+                # print('persion: '+persion)
                 nid = persion[0]
                 print("nid: "+nid)
                 birth = persion[1]
