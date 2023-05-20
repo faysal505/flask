@@ -11,6 +11,7 @@ import re
 app = Flask(__name__)
 db = SQLAlchemy()
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://mydata_839h_user:J56VGKBunMhYrRrPjdJxTrcnYD55bdDl@dpg-cgts3nt269vbmevj9tfg-a.oregon-postgres.render.com/mydata_839h"
+app.config['PERMANENT_SESSION_LIFETIME'] = 3600
 db.init_app(app)
 app.secret_key = '44441234'
 
@@ -22,7 +23,7 @@ class User(db.Model):
     phone = db.Column(db.String(20), nullable=True)
     password = db.Column(db.String(50), nullable=False)
     balance = db.Column(db.Integer, default=0)
-    rate = db.Column(db.Integer, default=10)
+    rate = db.Column(db.Integer, default=5)
     apikey = db.Column(db.String(1000), nullable=True)
     count = db.Column(db.Integer, default=0)
     active = db.Column(db.Integer, nullable=False, default=0)
