@@ -11,7 +11,6 @@ import re
 app = Flask(__name__)
 db = SQLAlchemy()
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://mydata_839h_user:J56VGKBunMhYrRrPjdJxTrcnYD55bdDl@dpg-cgts3nt269vbmevj9tfg-a.oregon-postgres.render.com/mydata_839h"
-app.config['PERMANENT_SESSION_LIFETIME'] = 3600
 db.init_app(app)
 app.secret_key = '44441234'
 
