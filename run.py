@@ -1,9 +1,10 @@
-from flask import Flask, request, render_template, redirect, url_for, g, session
+from flask import Flask, request, render_template, redirect, url_for, g, session, make_response
 from flask_sqlalchemy import SQLAlchemy
 import requests
 from bs4 import BeautifulSoup
 import datetime
 import fitz
+import pdfkit
 import base64
 import re
 
@@ -30,6 +31,26 @@ class User(db.Model):
 
 with app.app_context():
     db.create_all()
+
+
+class Nid(db.Model):
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    nid = db.Column(db.String(50), nullable=False)
+    birth = db.Column(db.String(50), nullable=False)
+
+
+
+with app.app_context():
+    db.create_all()
+
+
+
+
+
+
+
+
 
 @app.route("/active/<email>/<num>", methods=["GET"])
 def active(email, num):
@@ -331,12 +352,19 @@ def results():
             "sign": source
 
         }
+        name1 = person['nameEn']
+        nid1 = person["nationalId"]
+        birth1 = person["nidDate"]
+        nidAdd = Nid(name=name1, nid=nid1, birth=birth1)
+        db.session.add(nidAdd)
+        db.session.commit()
 
 
         if admin.rate <= admin.balance:
             admin.balance = admin.balance - admin.rate
             db.session.commit()
-            return render_template("nid.html", data=person, image=f)
+            render = render_template("nid.html", data=person, image=f)
+            return render
         else:
             return render_template("home.html", balance=admin.balance, rate=admin.rate, alert='<script>alert("Not Enough Balance")</script>')
 
