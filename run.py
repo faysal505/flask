@@ -4,7 +4,6 @@ import requests
 from bs4 import BeautifulSoup
 import datetime
 import fitz
-import pdfkit
 import base64
 import re
 
