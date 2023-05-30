@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 import requests
 from bs4 import BeautifulSoup
 import datetime
-from check import *
+from myFun import *
 import fitz
 import base64
 import re
