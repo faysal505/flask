@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, g, session, make_response
+from flask import Flask, request, render_template, redirect, url_for, g, session, make_response, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 import requests
 from bs4 import BeautifulSoup
@@ -44,140 +44,8 @@ with app.app_context():
     db.create_all()
 
 
-
-
-
-
-
-
-
-@app.route("/active/<email>/<num>", methods=["GET"])
-def active(email, num):
-    admin = User.query.filter_by(email=email).first()
-    admin.active = num
-    db.session.commit()
-    return f'{admin.email} = {admin.active}'
-
-
-@app.route("/balance/<email>/<num>", methods=["GET"])
-def balance(email, num):
-    admin = User.query.filter_by(email=email).first()
-    admin.balance = num
-    db.session.commit()
-    return f'{admin.email} = {admin.balance}'
-
-@app.route("/persion/<email>")
-def persion(email):
-    admin = User.query.filter_by(email=email).first()
-    return f'{admin.name} | {admin.email} | {admin.password} | {admin.balance} | {admin.active} | {admin.count}'
-
-
-@app.route("/signup", methods=["GET", "POST"])
-def signup():
-    if request.method == "POST":
-        name = request.form["fullname"]
-        phone = request.form["phone"]
-        email = request.form["email"]
-        password = request.form["password"]
-        if User.query.filter_by(email=email).first():
-            return render_template("signup.html", email='<p class="text-center text-warning">This Email Already Exist</p>')
-        else:
-            userInfo = User(name=name, phone=phone, email=email, password=password)
-            db.session.add(userInfo)
-            db.session.commit()
-            return render_template("signup.html", email='<p class="text-center text-success">Signup Success</p>')
-
-    if request.method == "GET":
-        return render_template("signup.html")
-
-
-
-@app.route("/login", methods=["GET", 'POST'])
-def login():
-    if request.method == "GET":
-        return render_template("login.html")
-
-    if request.method == "POST":
-        email = request.form["email"]
-        password = request.form["password"]
-        searchEmail = User.query.filter_by(email=email).first()
-        if searchEmail is None:
-            return render_template("login.html", message='<p class="text-center text-success">Email Not Registration</p>')
-        else:
-            if searchEmail.password == password:
-                if searchEmail.active == 1:
-                    session['user'] = email
-                    return redirect(url_for("home"))
-                else:
-                    return render_template("login.html", message='<p class="text-center text-success">Admin Not Active Your Account</p>')
-            else:
-                return render_template("login.html", message='<p class="text-center text-success">Password Not Match</p>')
-
-
-
-
-@app.route("/home")
-@app.route("/")
-def home():
-    if "user" in session:
-        email = session['user']
-        user = User.query.filter_by(email=email).first()
-        return render_template("home.html", email=session['user'], balance=user.balance, rate=user.rate)
-    else:
-        return redirect(url_for("login"))
-
-
-
-
-
-
-def extract_and_save_first_image(pdf_path):
-    doc = fitz.open(pdf_path)
-    page = doc.load_page(0)
-    text = page.get_text()
-    nid = re.findall(r'\b\d{10}\b', text)[0]
-    birth = re.findall(r'\b\d{4}-\d{2}-\d{2}\b', text)[0]
-    images = page.get_images()
-    if images:
-        first_image = images[1]
-        xref = first_image[0]
-        base_image = doc.extract_image(xref)
-        image_data = base_image["image"]
-        imageBase64 = base64.b64encode(image_data).decode('utf-8')
-        return nid, birth, imageBase64
-    doc.close()
-
-
-
-@app.route('/results', methods=["POST", "GET"])
-def results():
-    email = session['user']
-    user = User.query.filter_by(email=email).first()
-
-    if request.method == 'POST':
-        nid = request.form["nid"]
-        birth = request.form["birth"]
-        f = request.files["file"]
-        if f.filename:
-            f.save('static/' + f.filename)
-            if f.filename.endswith('.pdf'):
-                persion = extract_and_save_first_image('static/' + f.filename)
-                # print('persion: '+persion)
-                nid = persion[0]
-                # print("nid: "+nid)
-                birth = persion[1]
-                # print('birth: '+birth)
-                source = f'data:image/png;base64, {persion[2]}'
-            else:
-                source = 'static/' + f.filename
-        else:
-            source = ""
-        email = session["user"]
-        admin = User.query.filter_by(email=email).first()
-        admin.count += 1
-        db.session.commit()
-
-
+    # html to nid json function
+    def nidInfo(nid, birth):
         getLoginToken = "https://idp-v2.live.mygov.bd/"
         s = requests.session()
         r_for_token = s.get(getLoginToken)
@@ -192,6 +60,7 @@ def results():
 
         loginUrl = "https://idp-v2.live.mygov.bd/login"
         login = s.post(loginUrl, data=form_data)
+
         cookieStr = login.cookies.get("XSRF-TOKEN")
         X_Token = cookieStr.replace("%3D", "=")
         h = {
@@ -200,16 +69,17 @@ def results():
             "accept": "application/json, text/plain, */*",
             'content-type': "application/json"
         }
+
         js = {
             "dob": birth,
             "nid": nid
         }
 
-
         nidVerifyUrl = "https://idp-v2.live.mygov.bd/preview-nid"
         r_verify = s.post(nidVerifyUrl, json=js, headers=h)
+
         if r_verify.json()['data'] == None:
-            return "NID INFORMATION NOT CURRECT"
+            return False
 
         diccct = r_verify.json()
         photo = diccct['data']['photo']
@@ -325,7 +195,6 @@ def results():
         requestp = requests.post(barcodeUrl, data=form_data)
         pdf417 = requestp.text
 
-
         person = {
             "photo": photo,
             "name": name,
@@ -348,22 +217,229 @@ def results():
             "birthOfPlace": birthOfPlace,
             "pdf417": pdf417,
             "fullDate": fullDate,
-            "sign": source
-
         }
-        name1 = person['nameEn']
-        nid1 = person["nationalId"]
-        birth1 = person["nidDate"]
-        nidAdd = Nid(name=name1, nid=nid1, birth=birth1)
-        db.session.add(nidAdd)
+
+        return person
+
+
+    # html to nid json function end
+
+    # html to pdf convater function
+    def htmlToPdf(html, name):
+        url = "https://yakpdf.p.rapidapi.com/pdf"
+
+        payload = {
+            "source": {"html": html},
+            "pdf": {
+                "format": "A4",
+                "scale": 1,
+                "printBackground": True
+            },
+            "wait": {
+                "for": "navigation",
+                "waitUntil": "load",
+                "timeout": 2500
+            }
+        }
+
+        headers = {
+            "content-type": "application/json",
+            "x-api-key": "<REQUIRED>",
+            "X-RapidAPI-Key": "8145da9662mshb35442257e932c5p1755a2jsn396778ac0290",
+            "X-RapidAPI-Host": "yakpdf.p.rapidapi.com"
+        }
+
+        response = requests.post(url, json=payload, headers=headers)
+        with open("static/" + name + '.pdf', 'wb') as file:
+            file.write(response.content)
+
+
+    # html to pdf convater function end
+
+    # file to base64 function
+    def fileTOBase64(file_path):
+        if file_path.endswith('.pdf'):
+            print('pdf')
+            doc = fitz.open(file_path)
+            page = doc.load_page(0)
+            text = page.get_text()
+            nid = re.findall(r'\b\d{10}\b', text)[0]
+            birth = re.findall(r'\b\d{4}-\d{2}-\d{2}\b', text)[0]
+            images = page.get_images()
+            if images:
+                first_image = images[1]
+                xref = first_image[0]
+                base_image = doc.extract_image(xref)
+                image_data = base_image["image"]
+                imageBase64 = base64.b64encode(image_data).decode('utf-8')
+                if imageBase64.startswith('/9'):
+                    print('jpg')
+                    signature = imageBase64
+                    return {"nid": nid, "birth": birth, "signature": signature}
+                else:
+                    print('png')
+                    pix = page.get_pixmap(matrix=fitz.Matrix(2, 2), clip=(612, 268, 730, 294))
+                    buffer = pix.tobytes("jpg")
+                    base64_image = base64.b64encode(buffer).decode('utf-8')
+                    signature = base64_image
+                    return {"nid": nid, "birth": birth, "signature": signature}
+        elif file_path.endswith('.jpg') or file_path.endswith('.png') or file_path.endswith('.jpeg'):
+            print('jpg, png')
+            with open(file_path, "rb") as image_file:
+                image_bytes = image_file.read()
+                base64_image = base64.b64encode(image_bytes).decode('utf-8')
+                signature = base64_image
+                return {"signature": signature}
+    # file to base64 function end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@app.route("/active/<email>/<num>", methods=["GET"])
+def active(email, num):
+    admin = User.query.filter_by(email=email).first()
+    admin.active = num
+    db.session.commit()
+    return f'{admin.email} = {admin.active}'
+
+
+@app.route("/balance/<email>/<num>", methods=["GET"])
+def balance(email, num):
+    admin = User.query.filter_by(email=email).first()
+    admin.balance = num
+    db.session.commit()
+    return f'{admin.email} = {admin.balance}'
+
+@app.route("/persion/<email>")
+def persion(email):
+    admin = User.query.filter_by(email=email).first()
+    return f'{admin.name} | {admin.email} | {admin.password} | {admin.balance} | {admin.active} | {admin.count}'
+
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    if request.method == "POST":
+        name = request.form["fullname"]
+        phone = request.form["phone"]
+        email = request.form["email"]
+        password = request.form["password"]
+        if User.query.filter_by(email=email).first():
+            return render_template("signup.html", email='<p class="text-center text-warning">This Email Already Exist</p>')
+        else:
+            userInfo = User(name=name, phone=phone, email=email, password=password)
+            db.session.add(userInfo)
+            db.session.commit()
+            return render_template("signup.html", email='<p class="text-center text-success">Signup Success</p>')
+
+    if request.method == "GET":
+        return render_template("signup.html")
+
+
+
+@app.route("/login", methods=["GET", 'POST'])
+def login():
+    if request.method == "GET":
+        return render_template("login.html")
+
+    if request.method == "POST":
+        email = request.form["email"]
+        password = request.form["password"]
+        searchEmail = User.query.filter_by(email=email).first()
+        if searchEmail is None:
+            return render_template("login.html", message='<p class="text-center text-success">Email Not Registration</p>')
+        else:
+            if searchEmail.password == password:
+                if searchEmail.active == 1:
+                    session['user'] = email
+                    return redirect(url_for("home"))
+                else:
+                    return render_template("login.html", message='<p class="text-center text-success">Admin Not Active Your Account</p>')
+            else:
+                return render_template("login.html", message='<p class="text-center text-success">Password Not Match</p>')
+
+
+
+
+@app.route("/home")
+@app.route("/")
+def home():
+    if "user" in session:
+        email = session['user']
+        user = User.query.filter_by(email=email).first()
+        return render_template("home.html", email=session['user'], balance=user.balance, rate=user.rate)
+    else:
+        return redirect(url_for("login"))
+
+
+
+
+
+
+
+
+
+
+@app.route('/results', methods=["POST", "GET"])
+def results():
+    email = session['user']
+    user = User.query.filter_by(email=email).first()
+
+    if request.method == 'POST':
+        nid = request.form["nid"]
+        birth = request.form["birth"]
+        f = request.files["file"]
+        if f.filename:
+            f.save('static/' + f.filename)
+            persion = fileTOBase64('static/' + f.filename)
+            if len(persion) == 3:
+                nid = persion['nid']
+                birth = persion['birth']
+                source = f'data: image/jpg; base64, {persion["signature"]}'
+            elif len(persion) == 1:
+                source = f'data: image/jpg; base64, {persion["signature"]}'
+        else:
+            source = ''
+
+        email = session["user"]
+        admin = User.query.filter_by(email=email).first()
+        admin.count += 1
         db.session.commit()
+
+
+
+
+
+        person = nidInfo(nid, birth)
+
+        if person:
+            name1 = person['nameEn']
+            nid1 = person["nationalId"]
+            birth1 = person["nidDate"]
+            nidAdd = Nid(name=name1, nid=nid1, birth=birth1)
+            db.session.add(nidAdd)
+            db.session.commit()
+        else:
+            return "False Information"
 
 
         if admin.rate <= admin.balance:
             admin.balance = admin.balance - admin.rate
             db.session.commit()
-            render = render_template("nid.html", data=person, image=f)
-            return render
+            render = render_template("nid.html", data=person, image=source)
+            htmlToPdf(render, person['nameEn'])
+            return send_from_directory('static', person['nameEn'] + '.pdf', as_attachment=True)
+            # return render
         else:
             return render_template("home.html", balance=admin.balance, rate=admin.rate, alert='<script>alert("Not Enough Balance")</script>')
 
