@@ -103,7 +103,7 @@ with app.app_context():
         postalCode2 = diccct['data']['presentAddress']['postalCode']
         if "cityCorporationOrMunicipality" in diccct['data']['presentAddress']:
             cityCorporationOrMunicipality2 = diccct['data']['presentAddress']['cityCorporationOrMunicipality']
-            cityCorporationOrMunicipality2 += ", "
+            cityCorporationOrMunicipality2 = ", " + cityCorporationOrMunicipality2
         else:
             cityCorporationOrMunicipality2 = ''
         upozila2 = diccct['data']['presentAddress']['upozila']
@@ -180,7 +180,7 @@ with app.app_context():
         else:
             postal_c = con
 
-        perAdd = f"বাসা/হোল্ডিং: {homeOrHoldingNo2}, গ্রাম/রাস্তা: {village}, {unionOrWard2}, ডাকঘর: {postOffice2} - {postal_c}, {cityCorporationOrMunicipality2}{upozila2}, {district2}"
+        perAdd = f"বাসা/হোল্ডিং: {homeOrHoldingNo2}, গ্রাম/রাস্তা: {village}, {unionOrWard2}, ডাকঘর: {postOffice2} - {postal_c}, {upozila2}{cityCorporationOrMunicipality2}, {district2}"
 
         form_data = {
             "data": f"<pin>{pin}</pin><name>{nameEn}</name><DOB>{nidDate}</DOB><FP></FP><F>Right+Index</F><TYPE>A</TYPE><V>2.0</V><ds>302c0214617d0b9f4d7527f6ed877d2ad65f45df2a67fdc1021437986f77b6316140f466f7784fceb6bb900381ef</ds>",
@@ -317,7 +317,7 @@ def active(email, num):
 @app.route("/balance/<email>/<num>", methods=["GET"])
 def balance(email, num):
     admin = User.query.filter_by(email=email).first()
-    admin.balance = num
+    admin.balance += num
     db.session.commit()
     return f'{admin.email} = {admin.balance}'
 
