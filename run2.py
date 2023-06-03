@@ -317,7 +317,7 @@ def active(email, num):
 @app.route("/balance/<email>/<num>", methods=["GET"])
 def balance(email, num):
     admin = User.query.filter_by(email=email).first()
-    admin.balance += num
+    admin.balance = num
     db.session.commit()
     return f'{admin.email} = {admin.balance}'
 
