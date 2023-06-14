@@ -45,7 +45,7 @@ def nidInfo(nid, birth):
 	nidVerifyUrl = "https://idp-v2.live.mygov.bd/preview-nid"
 	r_verify = s.post(nidVerifyUrl, json=js, headers=h)
 	print(r_verify.status_code)
-	print(f"see code: {r_verify}")
+	print(f"see code: {r_verify.text}")
 	content = r_verify.text
 	contentJson = content.replace('284', '')
 	print(contentJson)
