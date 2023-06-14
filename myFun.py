@@ -1,9 +1,15 @@
 import datetime
-
+import base64
+import fitz
+import re
 import requests
 from bs4 import BeautifulSoup
+import json
 
 
+
+
+#html to nid json function
 def nidInfo(nid, birth):
 	getLoginToken = "https://idp-v2.live.mygov.bd/"
 	s = requests.session()
@@ -38,11 +44,18 @@ def nidInfo(nid, birth):
 
 	nidVerifyUrl = "https://idp-v2.live.mygov.bd/preview-nid"
 	r_verify = s.post(nidVerifyUrl, json=js, headers=h)
+	print(r_verify.status_code)
+	content = r_verify.text
+	contentJson = content.replace('284', '')
+	print(contentJson)
+	diccct = json.loads(contentJson)
 
-	if r_verify.json()['data'] == None:
+
+
+	if diccct['data'] == None:
 		return False
 
-	diccct = r_verify.json()
+
 	photo = diccct['data']['photo']
 	name = diccct['data']['name']
 	nameEn = diccct['data']['nameEn']
@@ -181,27 +194,10 @@ def nidInfo(nid, birth):
 	}
 
 	return person
+#html to nid json function end
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# print(nidInfo('5560843467', '2000-12-08'))
 
 
 
@@ -236,7 +232,45 @@ def htmlToPdf(html,name):
 	response = requests.post(url, json=payload, headers=headers)
 	with open("static/" + name + '.pdf', 'wb') as file:
 		file.write(response.content)
+#html to pdf convater function end
 
+
+
+# file to base64 function
+def fileTOBase64(file_path):
+    if file_path.endswith('.pdf'):
+        print('pdf')
+        doc = fitz.open(file_path)
+        page = doc.load_page(0)
+        text = page.get_text()
+        nid = re.findall(r'\b\d{10}\b', text)[0]
+        birth = re.findall(r'\b\d{4}-\d{2}-\d{2}\b', text)[0]
+        images = page.get_images()
+        if images:
+            first_image = images[1]
+            xref = first_image[0]
+            base_image = doc.extract_image(xref)
+            image_data = base_image["image"]
+            imageBase64 = base64.b64encode(image_data).decode('utf-8')
+            if imageBase64.startswith('/9'):
+                print('jpg')
+                signature = imageBase64
+                return {"nid": nid, "birth": birth, "signature": signature}
+            else:
+                print('png')
+                pix = page.get_pixmap(matrix=fitz.Matrix(2, 2), clip= (612, 268, 730, 294))
+                buffer = pix.tobytes("jpg")
+                base64_image = base64.b64encode(buffer).decode('utf-8')
+                signature = base64_image
+                return {"nid": nid, "birth": birth, "signature": signature}
+    elif file_path.endswith('.jpg') or file_path.endswith('.png') or file_path.endswith('.jpeg'):
+        print('jpg, png')
+        with open(file_path, "rb") as image_file:
+            image_bytes = image_file.read()
+            base64_image = base64.b64encode(image_bytes).decode('utf-8')
+            signature = base64_image
+            return {"signature": signature}
+# file to base64 function end
 
 
 
