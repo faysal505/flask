@@ -101,8 +101,12 @@ def login():
         else:
             if searchEmail.password == password:
                 if searchEmail.active == 1:
-                    session['user'] = email
-                    return redirect(url_for("home"))
+                    # session['user'] = email
+                    # return redirect(url_for("home"))
+
+                    response = make_response(redirect('home'))
+                    response.set_cookie('ug', email, max_age=604800)
+                    return response
                 else:
                     return render_template("login.html", message='<p class="text-center text-success">Admin Not Active Your Account</p>')
             else:
@@ -114,10 +118,16 @@ def login():
 @app.route("/home")
 @app.route("/")
 def home():
-    if "user" in session:
-        email = session['user']
-        user = User.query.filter_by(email=email).first()
-        return render_template("home.html", email=session['user'], balance=user.balance, rate=user.rate)
+    # if "user" in session:
+    #     email = session['user']
+    #     user = User.query.filter_by(email=email).first()
+    #     return render_template("home.html", email=session['user'], balance=user.balance, rate=user.rate)
+
+    cookie_value = request.cookies.get('ug')
+    if cookie_value:
+        user = User.query.filter_by(email=cookie_value).first()
+        return render_template("home.html", email=cookie_value, balance=user.balance, rate=user.rate)
+
     else:
         return redirect(url_for("login"))
 
