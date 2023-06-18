@@ -142,7 +142,7 @@ def home():
 
 @app.route('/results', methods=["POST", "GET"])
 def results():
-    email = session['user']
+    email = request.cookies.get('ug')
     user = User.query.filter_by(email=email).first()
 
     if request.method == 'POST':
@@ -161,7 +161,7 @@ def results():
         else:
             source = ''
 
-        email = session["user"]
+        email = request.cookies.get('ug')
         admin = User.query.filter_by(email=email).first()
         admin.count += 1
         db.session.commit()
