@@ -2,7 +2,7 @@
 <html>
 
 <head>
-   <title>{{data.nameEn}}</title>
+   <title>{{nameEn}}</title>
    <meta charSet="utf-8" />
    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
    <meta name="next-head-count" content="3" />
@@ -53,7 +53,7 @@
                                           src="https://i.ibb.co/F3Y3Tp5/flower-logo.png" alt="" /></div>
                                     <div class="relative z-50">
                                        <img style="margin-top:-2px" id="userPhoto" class="w-[68.2px] h-[78px]" alt=""
-                                          src="data:image/jpeg;base64, {{data.photo}}" />
+                                          src="static/{{photo}}"/>
                                        <div
                                           class="text-center text-xs flex items-start justify-center pt-[5px] w-[68.2px] mx-auto h-[38.5px] overflow-hidden"
                                           id="card_signature"><span style="font-family:Comic sans ms"></span>
@@ -68,37 +68,37 @@
                                              <p class="space-x-4 leading-3" style="padding-left:1px"><span class="bn"
                                                    style="font-size:16.53px">নাম:</span><span class=""
                                                    style="font-size:16.53px;padding-left:3px;-webkit-text-stroke:0.25px black"
-                                                   id="nameBn">{{data.name}}</span></p>
+                                                   id="nameBn">{{name}}</span></p>
                                           </div>
                                           <div>
                                              <p class="space-x-2 leading-3"
                                                 style="margin-bottom:-1.4px;margin-top:1.4px;padding-left:1px"><span
                                                    style="font-size:10px">Name: </span><span
                                                    style="font-size:12.73px;padding-left:1px"
-                                                   id="nameEn">{{data.nameEn}}</span></p>
+                                                   id="nameEn">{{nameEn}}</span></p>
                                           </div>
                                           <div>
                                              <p class="bn space-x-3 leading-3" style="padding-left:1px"><span
                                                    id="fatherOrHusband" style="font-size:14px">পিতা: </span><span
                                                    style="font-size:14px;transform:scaleX(0.724)"
-                                                   id="card_father_name">{{data.father}}</span></p>
+                                                   id="card_father_name">{{father}}</span></p>
                                           </div>
                                           <div>
                                              <p class="bn space-x-3 leading-3"
                                                 style="margin-top:-2.5px;padding-left:1px"><span
                                                    style="font-size:14px">মাতা: </span><span
                                                    style="font-size:14px;transform:scaleX(0.724)"
-                                                   id="card_mother_name">{{data.mother}}</span></p>
+                                                   id="card_mother_name">{{mother}}</span></p>
                                           </div>
                                           <div class="leading-4" style="font-size:12px;margin-top:-1.2px">
                                              <p style="margin-top:-2px"><span>Date of Birth: </span><span
                                                    id="card_date_of_birth"
-                                                   class="text-[#ff0000]">{{data.nidDate}}</span></p>
+                                                   class="text-[#ff0000]">{{birth}}</span></p>
                                           </div>
                                           <div class="-mt-0.5 leading-4" style="font-size:12px;margin-top:-5px">
                                              <p style="margin-top:-3.5px"><span>ID NO: </span><span
                                                    class="text-[#ff0000] font-bold"
-                                                   id="card_nid_no">{{data.nationalId}}</span></p>
+                                                   id="card_nid_no">{{nid}}</span></p>
                                           </div>
                                        </div>
                                     </div>
@@ -116,7 +116,7 @@
                                     <div class="col-span-1 bn px-1 leading-[11px]"
                                        style="font-size:11.73px;letter-spacing:-0.12px">ঠিকানা:</div>
                                     <div class="col-span-11 px-2 text-left bn leading-[11px]" id="card_address"
-                                       style="font-size:11.73px;letter-spacing:-0.12px">{{data.perAdd}}</div>
+                                       style="font-size:11.73px;letter-spacing:-0.12px">{{address}}</div>
                                     <div class="col-span-12 mt-auto flex justify-between">
                                        <p class="bn flex items-center font-medium"
                                           style="margin-bottom:-5px;padding-left:0px"><span
@@ -126,9 +126,9 @@
                                           <span style="font-size:9px">Blood Group:</span>
                                           <b style="font-size:9.33px;margin-bottom:-1.7px;display:inline-block"
                                              class="text-[#ff0000] mx-1 font-bold sans w-5"
-                                             id="card_blood">{{data.bloodGroup}}</b><span style="font-size:10.66px">
+                                             id="card_blood">{{blood}}</b><span style="font-size:10.66px">
                                              জন্মস্থান: </span><span class="ml-1" id="card_birth_place"
-                                             style="font-size:10.66px">{{data.birthOfPlace}}</span>
+                                             style="font-size:10.66px">{{birthPlace}}</span>
                                        </p>
                                        <div
                                           class="text-gray-100 absolute -bottom-[2px] w-[30.5px] h-[13px] -right-[2px] overflow-hidden">
@@ -149,10 +149,10 @@
                                     <div class="flex justify-between items-center -mt-[5px]">
                                        <p class="bn" style="font-size:14px">প্রদানকারী কর্তৃপক্ষের স্বাক্ষর</p>
                                        <span class="pr-4 bn" style="font-size:12px;padding-top:1px">প্রদানের তারিখ:<span
-                                             class="ml-2.5" id="card_date">{{data.fullDate}}</span></span>
+                                             class="ml-2.5" id="card_date">০৩/০৬/২০১৫</span></span>
                                     </div>
                                     <div><img id="card_qr_code" class="w-full h-[39px] mt-1" alt="NID Card Generator"
-                                          src="data:image/jpeg;base64, {{data.pdf417}}" /></div>
+                                          src="data:image/jpeg;base64, {{scannter}}" /></div>
                                  </div>
                               </div>
                            </div>
