@@ -6,7 +6,11 @@ import datetime
 import fitz
 import base64
 import re
+from cryptography.fernet import Fernet
 from myFun import *
+
+key = Fernet.generate_key()
+cipher_suite = Fernet(key)
 
 
 app = Flask(__name__)
@@ -93,7 +97,7 @@ def login():
         return render_template("login.html")
 
     if request.method == "POST":
-        email = request.form["email"]
+        email = request.form["email"].lower()
         password = request.form["password"]
         searchEmail = User.query.filter_by(email=email).first()
         if searchEmail is None:
@@ -104,8 +108,10 @@ def login():
                     # session['user'] = email
                     # return redirect(url_for("home"))
 
+                    encrypted_email = cipher_suite.encrypt(email.encode())
+
                     response = make_response(redirect('home'))
-                    response.set_cookie('ug', email, max_age=604800)
+                    response.set_cookie('ug', encrypted_email, max_age=604800)
                     return response
                 else:
                     return render_template("login.html", message='<p class="text-center text-success">Admin Not Active Your Account</p>')
@@ -125,8 +131,9 @@ def home():
 
     cookie_value = request.cookies.get('ug')
     if cookie_value:
-        user = User.query.filter_by(email=cookie_value).first()
-        return render_template("home.html", email=cookie_value, balance=user.balance, rate=user.rate)
+        decrypted_message = cipher_suite.decrypt(cookie_value).decode()
+        user = User.query.filter_by(email=decrypted_message).first()
+        return render_template("home.html", email=decrypted_message, balance=user.balance, rate=user.rate)
 
     else:
         return redirect(url_for("login"))
