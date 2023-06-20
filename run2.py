@@ -6,11 +6,7 @@ import datetime
 import fitz
 import base64
 import re
-from cryptography.fernet import Fernet
 from myFun import *
-
-key = Fernet.generate_key()
-cipher_suite = Fernet(key)
 
 
 app = Flask(__name__)
@@ -105,14 +101,8 @@ def login():
         else:
             if searchEmail.password == password:
                 if searchEmail.active == 1:
-                    # session['user'] = email
-                    # return redirect(url_for("home"))
-
-                    encrypted_email = cipher_suite.encrypt(email.encode())
-
-                    response = make_response(redirect('home'))
-                    response.set_cookie('ug', encrypted_email, max_age=604800)
-                    return response
+                    session['user'] = email
+                    return redirect('home')
                 else:
                     return render_template("login.html", message='<p class="text-center text-success">Admin Not Active Your Account</p>')
             else:
@@ -124,16 +114,10 @@ def login():
 @app.route("/home")
 @app.route("/")
 def home():
-    # if "user" in session:
-    #     email = session['user']
-    #     user = User.query.filter_by(email=email).first()
-    #     return render_template("home.html", email=session['user'], balance=user.balance, rate=user.rate)
-
-    cookie_value = request.cookies.get('ug')
-    if cookie_value:
-        decrypted_message = cipher_suite.decrypt(cookie_value).decode()
-        user = User.query.filter_by(email=decrypted_message).first()
-        return render_template("home.html", email=decrypted_message, balance=user.balance, rate=user.rate)
+    if "user" in session:
+        email = session['user']
+        user = User.query.filter_by(email=email).first()
+        return render_template("home.html", email=session['user'], balance=user.balance, rate=user.rate)
 
     else:
         return redirect(url_for("login"))
@@ -149,7 +133,7 @@ def home():
 
 @app.route('/results', methods=["POST", "GET"])
 def results():
-    email = request.cookies.get('ug')
+    email = session['user']
     user = User.query.filter_by(email=email).first()
 
     if request.method == 'POST':
@@ -168,7 +152,7 @@ def results():
         else:
             source = ''
 
-        email = request.cookies.get('ug')
+        email = session["user"]
         admin = User.query.filter_by(email=email).first()
         admin.count += 1
         db.session.commit()
