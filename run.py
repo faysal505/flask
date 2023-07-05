@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 
 
-@app.route('/open_text', methods=['GET'])
+@app.route('/open_text')
 def open_text():
     file_name = 'saved_text.txt'
 
@@ -13,7 +13,7 @@ def open_text():
     with open(file_name, 'r') as file:
         text = file.read()
 
-    return text
+    return "65"
 
 @app.route('/save_text')
 def save_text():
