@@ -3,6 +3,20 @@ import myCode
 
 app = Flask(__name__)
 
+
+
+@app.route('/save_text')
+def save_text():
+    text = "testing text"
+    file_name = 'saved_text.txt'
+
+    # Save the text to a file
+    with open(file_name, 'w') as file:
+        file.write(text)
+
+    return 'Text saved successfully!'
+
+
 @app.route('/')
 def manually():
     return render_template('home.html')
