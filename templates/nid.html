@@ -53,11 +53,11 @@
                                           src="https://i.ibb.co/F3Y3Tp5/flower-logo.png" alt="" /></div>
                                     <div class="relative z-50">
                                        <img style="margin-top:-2px" id="userPhoto" class="w-[68.2px] h-[78px]" alt=""
-                                          src="data:image/jpeg;base64, {{data.photo}}" />
+                                          src="{{data.photo}}" />
                                        <div
                                           class="text-center text-xs flex items-start justify-center pt-[5px] w-[68.2px] mx-auto h-[38.5px] overflow-hidden"
                                           id="card_signature"><span style="font-family:Comic sans ms"></span>
-                                          <img id="user_sign" src="{{image}}" alt="">
+                                          <img id="user_sign" src="{{data.sign}}" alt="">
                                        </div>
                                     </div>
 
@@ -93,7 +93,7 @@
                                           <div class="leading-4" style="font-size:12px;margin-top:-1.2px">
                                              <p style="margin-top:-2px"><span>Date of Birth: </span><span
                                                    id="card_date_of_birth"
-                                                   class="text-[#ff0000]">{{data.nidDate}}</span></p>
+                                                   class="text-[#ff0000]">{{data.birth_like_nid}}</span></p>
                                           </div>
                                           <div class="-mt-0.5 leading-4" style="font-size:12px;margin-top:-5px">
                                              <p style="margin-top:-3.5px"><span>ID NO: </span><span
@@ -116,7 +116,7 @@
                                     <div class="col-span-1 bn px-1 leading-[11px]"
                                        style="font-size:11.73px;letter-spacing:-0.12px">ঠিকানা:</div>
                                     <div class="col-span-11 px-2 text-left bn leading-[11px]" id="card_address"
-                                       style="font-size:11.73px;letter-spacing:-0.12px">{{data.perAdd}}</div>
+                                       style="font-size:11.73px;letter-spacing:-0.12px">{{data.presentAddress}}</div>
                                     <div class="col-span-12 mt-auto flex justify-between">
                                        <p class="bn flex items-center font-medium"
                                           style="margin-bottom:-5px;padding-left:0px"><span
@@ -124,7 +124,7 @@
                                              style="display:inline-block;margin-left:3px;margin-right:3px"><span><span
                                                    style="display:inline-block;font-size:11px;font-family:arial;margin-top:2px">/</span></span></span>
                                           <span style="font-size:9px">Blood Group:</span>
-                                          <b style="font-size:9.33px;margin-bottom:-1.7px;display:inline-block"
+                                          <b style="font-size:9.33px;margin-bottom:-1.7px;display:inline-block; text-transform: uppercase;"
                                              class="text-[#ff0000] mx-1 font-bold sans w-5"
                                              id="card_blood">{{data.bloodGroup}}</b><span style="font-size:10.66px">
                                              জন্মস্থান: </span><span class="ml-1" id="card_birth_place"
