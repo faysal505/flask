@@ -5,6 +5,16 @@ app = Flask(__name__)
 
 
 
+@app.route('/open_text', methods=['GET'])
+def open_text():
+    file_name = 'saved_text.txt'
+
+    # Open the text file
+    with open(file_name, 'r') as file:
+        text = file.read()
+
+    return text
+
 @app.route('/save_text')
 def save_text():
     text = "testing text"
