@@ -3,6 +3,7 @@ import base64
 import re
 import requests
 from datetime import date
+from bs4 import BeautifulSoup
 
 
 current_date = date.today().strftime("%d-%m-%Y")
@@ -60,9 +61,15 @@ class manually:
 
             #get user signatur if png
             if image_info1["ext"] == "png":
+                sign_img_info = first_page.get_image_info()
+                imageX1 = sign_img_info[1]['bbox'][0] + 1
+                imageY1 = sign_img_info[1]['bbox'][1] + 1
+                imageX2 = sign_img_info[1]['bbox'][2] - 1
+                imageY3 = sign_img_info[1]['bbox'][3] - 1
                 page = doc.load_page(0)
-                pix = page.get_pixmap(matrix=fitz.Matrix(2, 2), clip= (612, 268, 729, 294))
-                buffer = pix.tobytes("jpg")
+                pix = page.get_pixmap(matrix=fitz.Matrix(2, 2), clip= (imageX1, imageY1, imageX2, imageY3))
+                # pix.save("ffffffffffff.jpeg")
+                buffer = pix.tobytes("jpeg")
                 base64_image = base64.b64encode(buffer).decode('utf-8')
                 images_dict["user_signature"] = "data:image/jpeg;base64, " + base64_image
         return images_dict
@@ -127,26 +134,7 @@ class manually:
                 bangla += "/"
         return bangla
 
-    @staticmethod
-    def scanner(pin, nameEn, birth):
-        form_data = {
-            "data": f"<pin>{pin}</pin><name>{nameEn}</name><DOB>{birth}</DOB><FP></FP><F>Right+Index</F><TYPE>A</TYPE><V>2.0</V><ds>302c0214617d0b9f4d7527f6ed877d2ad65f45df2a67fdc1021437986f77b6316140f466f7784fceb6bb900381ef</ds>",
-            "code": "PDF417",
-            "multiplebarcodes": "true",
-            "eclevel": "L",
-            "dmsize": "Default",
-            "base64": "true"
-        }
-
-        barcodeUrl = "https://barcode.tec-it.com/barcode.ashx"
-        requestp = requests.post(barcodeUrl, data=form_data)
-        return requestp.text
 
 
 
-
-# print(manually.mess())
-# c = manually.sign_text('kh3.pdf')
-# print(c)
-
-
+manually.sign_image('kh3.pdf')
