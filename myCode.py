@@ -1,6 +1,8 @@
 import fitz
 import base64
 import re
+from PyPDF2 import PdfReader
+import base64
 import requests
 from datetime import date
 from bs4 import BeautifulSoup
@@ -34,44 +36,66 @@ class manually:
 
 
 
+    # @staticmethod
+    # def sign_image(pdf_path):
+    #     doc = fitz.open(pdf_path)
+    #     first_page = doc[0]
+    #     images_list = first_page.get_images()
+    #     if len(images_list) == 2:
+    #         images_dict = {}
+    #
+    #         #get user image
+    #         user_image = images_list[0]
+    #         xref = user_image[0]
+    #         image_info = doc.extract_image(xref)
+    #         image_data = image_info["image"]
+    #         base64_code = base64.b64encode(image_data).decode("utf-8")
+    #         images_dict["user_image"] = "data:image/jpeg;base64, " + base64_code
+    #
+    #         #get user signature if jpeg
+    #         user_signature = images_list[1]
+    #         xref1 = user_signature[0]
+    #         image_info1 = doc.extract_image(xref1)
+    #         if image_info1["ext"] == "jpeg":
+    #             image_data1 = image_info1["image"]
+    #             base64_code1 = base64.b64encode(image_data1).decode("utf-8")
+    #             images_dict["user_signature"] = "data:image/jpeg;base64, " + base64_code1
+    #
+    #         #get user signatur if png
+    #         if image_info1["ext"] == "png":
+    #             sign_img_info = first_page.get_image_info()
+    #             imageX1 = sign_img_info[1]['bbox'][0] + 1
+    #             imageY1 = sign_img_info[1]['bbox'][1] + 1
+    #             imageX2 = sign_img_info[1]['bbox'][2] - 1
+    #             imageY3 = sign_img_info[1]['bbox'][3] - 1
+    #             page = doc.load_page(0)
+    #             pix = page.get_pixmap(matrix=fitz.Matrix(2, 2), clip= (imageX1, imageY1, imageX2, imageY3))
+    #             # pix.save("ffffffffffff.jpeg")
+    #             buffer = pix.tobytes("jpeg")
+    #             base64_image = base64.b64encode(buffer).decode('utf-8')
+    #             images_dict["user_signature"] = "data:image/jpeg;base64, " + base64_image
+    #     return images_dict
+
+
     @staticmethod
     def sign_image(pdf_path):
-        doc = fitz.open(pdf_path)
-        first_page = doc[0]
-        images_list = first_page.get_images()
-        if len(images_list) == 2:
-            images_dict = {}
+        images_dict = {}
+        reader = PdfReader(pdf_path)
+        page1 = reader.pages[0]
+        image_list = page1.images
+        # user image
+        image1 = image_list[0]
+        image_bytes = image1.data
+        base64_image = base64.b64encode(image_bytes)
+        base64_image_str = base64_image.decode('utf-8')
+        images_dict["user_image"] = "data:image/jpg;base64," + base64_image_str
 
-            #get user image
-            user_image = images_list[0]
-            xref = user_image[0]
-            image_info = doc.extract_image(xref)
-            image_data = image_info["image"]
-            base64_code = base64.b64encode(image_data).decode("utf-8")
-            images_dict["user_image"] = "data:image/jpeg;base64, " + base64_code
-
-            #get user signature if jpeg
-            user_signature = images_list[1]
-            xref1 = user_signature[0]
-            image_info1 = doc.extract_image(xref1)
-            if image_info1["ext"] == "jpeg":
-                image_data1 = image_info1["image"]
-                base64_code1 = base64.b64encode(image_data1).decode("utf-8")
-                images_dict["user_signature"] = "data:image/jpeg;base64, " + base64_code1
-
-            #get user signatur if png
-            if image_info1["ext"] == "png":
-                sign_img_info = first_page.get_image_info()
-                imageX1 = sign_img_info[1]['bbox'][0] + 1
-                imageY1 = sign_img_info[1]['bbox'][1] + 1
-                imageX2 = sign_img_info[1]['bbox'][2] - 1
-                imageY3 = sign_img_info[1]['bbox'][3] - 1
-                page = doc.load_page(0)
-                pix = page.get_pixmap(matrix=fitz.Matrix(2, 2), clip= (imageX1, imageY1, imageX2, imageY3))
-                # pix.save("ffffffffffff.jpeg")
-                buffer = pix.tobytes("jpeg")
-                base64_image = base64.b64encode(buffer).decode('utf-8')
-                images_dict["user_signature"] = "data:image/jpeg;base64, " + base64_image
+        # signature image
+        image2 = image_list[1]
+        image_bytes = image2.data
+        base64_image = base64.b64encode(image_bytes)
+        base64_image_str = base64_image.decode('utf-8')
+        images_dict["user_signature"] = "data:image/png;base64," + base64_image_str
         return images_dict
 
 
