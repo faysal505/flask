@@ -69,17 +69,14 @@
 
 
 
-    <form action="/nid" method="post" enctype="multipart/form-data" class="mb-5 needs-validation" novalidate>
+    <form action="/nid" method="post" enctype="multipart/form-data" class="mb-5">
         <div class="container mb-5"> <!----------------------------- font-page-------------------------->
             <input type="hidden" value="" id="userImage" name="user">
             <input type="hidden" value="" id="signImage" name="sign">
             <div class="row row-gap-2">
                 <div class="col-sm-12 col-md-6 col-lg-3">
                     <label for="" class="form-label m-0">নাম (বাংলা)</label>
-                    <input type="text" class="form-control" name="name" id="" required>
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
+                    <input type="text" class="form-control" name="name" id="" autofocus>
                 </div>
 
                 <div class="col-sm-12 col-md-6 col-lg-3">
@@ -98,7 +95,7 @@
                 </div>
 
                 <div class="col-sm-12 col-md-6 col-lg-3">
-                    <label for="" class="form-label m-0" required>Date of Birth</label>
+                    <label for="" class="form-label m-0">Date of Birth</label>
                     <input type="text" class="form-control" name="birth_like_nid" id="birth_like_nid">
                     <input type="hidden" value="" id="birth" name="birth">
                 </div>
@@ -143,13 +140,10 @@
                 <div class="col-sm-12 col-md-6 col-lg-3">
                     <label for="" class="form-label m-0" required>প্রদানের তারিখ</label>
                     <input type="text" class="form-control" name="today_date" id="today_date">
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
                 </div>
 
                 <div class="col-sm-12 col-md-6 col-lg-3">
-                    <label for="" class="form-label m-0" required>পিন কোড</label>
+                    <label for="" class="form-label m-0">পিন কোড</label>
                     <input type="text" class="form-control" name="pin" id="pin">
                 </div>
             </div>
@@ -184,12 +178,14 @@
                         $('#userImage').attr('value', apiData["user_image"])
                         $('#signImage').attr('value', apiData["user_signature"])
                         $('#nid').attr('value', apiData["nid"])
+                        $('#nid').addClass('is-valid');
                         $('#pin').attr('value', apiData["pin"])
+                        $('#pin').addClass('is-valid');
                         $('#birth_like_nid').attr('value', apiData["birth_like_nid"])
+                        $('#birth_like_nid').addClass('is-valid');
                         $('#birth').attr('value', apiData["birth"])
                         $('#today_date').attr('value', apiData["today_date"])
-                        console.log('success')
-
+                        $('#today_date').addClass('is-valid');
                     },
                     error: function (xhr, status, error) {
                         console.log(error)
@@ -197,6 +193,26 @@
                 })
             });
         });
+    </script>
+    <script>
+        (() => {
+            'use strict'
+
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            const forms = document.querySelectorAll('.needs-validation')
+
+            // Loop over them and prevent submission
+            Array.from(forms).forEach(form => {
+                form.addEventListener('input', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
     </script>
 </body>
 
