@@ -161,4 +161,4 @@ class manually:
 
 
 
-manually.sign_image('kh3.pdf')
+
