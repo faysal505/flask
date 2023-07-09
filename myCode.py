@@ -1,11 +1,10 @@
 import fitz
-import base64
 import re
 from PyPDF2 import PdfReader
 import base64
-import requests
 from datetime import date
-from bs4 import BeautifulSoup
+from PIL import Image
+import pytesseract
 
 
 current_date = date.today().strftime("%d-%m-%Y")
@@ -158,7 +157,21 @@ class manually:
                 bangla += "/"
         return bangla
 
+    @staticmethod
+    def ocr(path):
+        doc = fitz.open(path)
+        page1 = doc.load_page(0)
+        txt = {}
+
+        # get name
+        name = page1.get_pixmap(matrix=fitz.Matrix(2, 2), clip=(200.28202819824219, 248.6907196044922, 500.67529296875, 264.6618347167969),dpi=300)
+        name.save("name.jpg")
+        pil = Image.open('name.jpg')
+        pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
+        name = pytesseract.pytesseract.image_to_string(pil, lang="ben")
+        txt['name'] = name.strip("\n")
 
 
 
 
+manually.ocr('kh3.pdf')
