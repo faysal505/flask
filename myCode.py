@@ -174,4 +174,4 @@ class manually:
 
 
 
-manually.ocr('kh3.pdf')
+
